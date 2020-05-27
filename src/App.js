@@ -1,24 +1,34 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
+
+const query = gql`
+  {
+    characters(filter: { status: "Alive" }) {
+      results {
+        id
+        name
+      }
+    }
+  }
+`;
 
 function App() {
+  const { loading, data, error } = useQuery(query);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <span>{loading && 'Cargando'}</span>
+      {loading === false &&
+      !error &&
+      data.characters &&
+      data.characters.results ? (
+        <ul>
+          {data.characters.results.map((r) => (
+            <li key={r.id}>{r.name}</li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }
